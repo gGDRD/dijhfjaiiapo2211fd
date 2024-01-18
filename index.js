@@ -7,7 +7,7 @@ bot.on("ready", () => {
   console.log(`Logged in as ${bot.user.username}`);
 
   const countMessages = async () => {
-    const channel = bot.getChannel("1190634763971727500"); 
+    const channel = bot.getChannel("1190634763971727500");
 
     if (!channel) {
       console.log('Canalul nu a fost găsit!');
@@ -15,27 +15,39 @@ bot.on("ready", () => {
     }
 
     try {
-      const messages = await channel.getMessages();
+      let totalMessages = 0;
+      let lastMessageID = null;
+
+      do {
+        const messages = await channel.getMessages({ limit: 900, before: lastMessageID });
+        totalMessages += messages.length;
+
+        if (messages.length > 0) {
+          lastMessageID = messages[messages.length - 1].id;
+        } else {
+          break;
+        }
+      } while (totalMessages < 50);
+
       const embed = {
         color: 0x0099ff,
-        description: `We currently have **${messages.length}** vouches.`
+        description: `We currently have **${totalMessages}** vouches.`
       };
 
       if (messageID) {
         bot.deleteMessage(channel.id, messageID);
       }
 
-     
       const sentMessage = await bot.createMessage(channel.id, { embed: embed });
       messageID = sentMessage.id;
 
-      console.log(`Numărul de mesaje în canalul ${channel.name} este: ${messages.length}`);
+      console.log(`Numărul total de mesaje în canalul ${channel.name} este: ${totalMessages}`);
     } catch (error) {
       console.error('A apărut o eroare:', error);
     }
   };
 
-  setInterval(countMessages, 10 * 60 * 1000);
+  setInterval(countMessages, 1 * 5 * 1000);
 });
 
 bot.connect();
