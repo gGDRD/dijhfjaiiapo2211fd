@@ -47,7 +47,7 @@ bot.on("ready", () => {
     }
   };
 
-  setInterval(countMessages, 1 * 5 * 1000);
+  setInterval(countMessages, 10 * 60 * 1000);
 });
 
 bot.connect();
